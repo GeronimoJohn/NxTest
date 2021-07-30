@@ -28,6 +28,7 @@ This repository is currently connected to a local database through PostgreSql wh
 
 Copy query below to test in the apollo server
 
+```graphql
 query ExampleQuery {
   feed {
     id
@@ -41,7 +42,7 @@ query ExampleQuery {
     }
   }
 }
-
+```
 
 ## More CLI Commands and NX information
 
