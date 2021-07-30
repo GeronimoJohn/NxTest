@@ -6,25 +6,35 @@ This project was generated using [Nx](https://nx.dev).
 
 🔎 **Smart, Extensible Build Framework**
 
-## A test repository trying out our new back end tech stack plus Express
+**A test repository trying out our new back end tech stack plus Express**
 
-A repository for testing out NX, Prisma, PostgreSql, Apollo Server, GraphQl, and Express
+A repository for testing out Prisma, PostgreSql, Apollo Server, GraphQl, and Express all in the NX build framework
 
-## Start Apollo Server
-
-Run `nx serve prisma-test` in the command line
-
-## Start Prisma Studio
-
-Run `npx prisma studio` in the command line
-
-If the database is up - you can create, read, update, or delete the data
-
-## Database Connection
+### Database Connection
 
 This repository is currently connected to a local database through PostgreSql which is managed by Prisma
 
-# GraphQL
+To connect to your local database
+
+Go to the `scheme.prisma` file which is found in the `prisma` folder
+
+Enter your `database url` to set up the connection to your database
+
+## Create and Seed the database
+
+Run the following command to create your PostgreSql database file. This also create the `user` and `post` tables that are defined in [`prisma/schema.prisma`](./prisma/schema.prisma):
+
+`npx prisma migrate dev --name init`
+
+Now, see the database with the sample data in [`prisma/seed.ts`](./prisma/seed.ts) by running the following command:
+
+`npx prisma db seed --preview-feature`
+
+### Start Apollo Server
+
+Run `nx serve prisma-test` in the command line
+
+### GraphQL
 
 Copy query below to test in the apollo server
 
@@ -43,6 +53,13 @@ query ExampleQuery {
   }
 }
 ```
+
+### Start Prisma Studio
+
+Run `npx prisma studio` in the command line
+
+If the database is up - you can create, read, update, or delete the data 
+
 
 ## More CLI Commands and NX information
 
