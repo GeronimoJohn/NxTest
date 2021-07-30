@@ -86,42 +86,9 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./apps/prisma-test/src/main.ts":
-/*!**************************************!*\
-  !*** ./apps/prisma-test/src/main.ts ***!
-  \**************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-Object.defineProperty(exports, "__esModule", { value: true });
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const express = __webpack_require__(/*! express */ "express");
-const apollo_server_express_1 = __webpack_require__(/*! apollo-server-express */ "apollo-server-express");
-const context_1 = __webpack_require__(/*! ./prisma/context */ "./apps/prisma-test/src/prisma/context.ts");
-const schema_1 = __webpack_require__(/*! ./prisma/schema */ "./apps/prisma-test/src/prisma/schema.ts");
-function startApolloServer() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const server = new apollo_server_express_1.ApolloServer({ schema: schema_1.schema, context: context_1.context });
-        yield server.start();
-        const app = express();
-        server.applyMiddleware({ app });
-        app.listen({ port: 3000 }, () => console.log(`Server ready at http://localhost:3000${server.graphqlPath}`));
-    });
-}
-startApolloServer();
-
-
-/***/ }),
-
-/***/ "./apps/prisma-test/src/prisma/context.ts":
+/***/ "./apps/prisma-test/src/apollo/context.ts":
 /*!************************************************!*\
-  !*** ./apps/prisma-test/src/prisma/context.ts ***!
+  !*** ./apps/prisma-test/src/apollo/context.ts ***!
   \************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -139,9 +106,9 @@ exports.context = {
 
 /***/ }),
 
-/***/ "./apps/prisma-test/src/prisma/schema.ts":
+/***/ "./apps/prisma-test/src/apollo/schema.ts":
 /*!***********************************************!*\
-  !*** ./apps/prisma-test/src/prisma/schema.ts ***!
+  !*** ./apps/prisma-test/src/apollo/schema.ts ***!
   \***********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
@@ -336,6 +303,39 @@ exports.schema = graphql_tools_1.makeExecutableSchema({
     resolvers,
     typeDefs,
 });
+
+
+/***/ }),
+
+/***/ "./apps/prisma-test/src/main.ts":
+/*!**************************************!*\
+  !*** ./apps/prisma-test/src/main.ts ***!
+  \**************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * This is not a production server yet!
+ * This is only a minimal backend to get started.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const express = __webpack_require__(/*! express */ "express");
+const apollo_server_express_1 = __webpack_require__(/*! apollo-server-express */ "apollo-server-express");
+const context_1 = __webpack_require__(/*! ./apollo/context */ "./apps/prisma-test/src/apollo/context.ts");
+const schema_1 = __webpack_require__(/*! ./apollo/schema */ "./apps/prisma-test/src/apollo/schema.ts");
+function startApolloServer() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const server = new apollo_server_express_1.ApolloServer({ schema: schema_1.schema, context: context_1.context });
+        yield server.start();
+        const app = express();
+        server.applyMiddleware({ app });
+        app.listen({ port: 3000 }, () => console.log(`Server ready at http://localhost:3000${server.graphqlPath}`));
+    });
+}
+startApolloServer();
 
 
 /***/ }),

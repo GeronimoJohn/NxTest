@@ -5,8 +5,8 @@
 
 import * as express from 'express';
 import { ApolloServer } from 'apollo-server-express'
-import { context } from './prisma/context'
-import { schema } from './prisma/schema'
+import { context } from './apollo/context'
+import { schema } from './apollo/schema'
 
 async function startApolloServer() {
 

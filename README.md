@@ -4,32 +4,47 @@
 
 This project was generated using [Nx](https://nx.dev).
 
-<p style="text-align: center;"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
-
 🔎 **Smart, Extensible Build Framework**
 
-## Adding capabilities to your workspace
+## A test repository trying out our new back end tech stack plus Express
 
-Nx supports many plugins which add capabilities for developing different types of applications and different tools.
+A repository for testing out NX, Prisma, PostgreSql, Apollo Server, GraphQl, and Express
 
-These capabilities include generating applications, libraries, etc as well as the devtools to test, and build projects as well.
+## Start Apollo Server
 
-Below are our core plugins:
+Run `nx serve prisma-test` in the command line
 
-- [React](https://reactjs.org)
-  - `npm install --save-dev @nrwl/react`
-- Web (no framework frontends)
-  - `npm install --save-dev @nrwl/web`
-- [Angular](https://angular.io)
-  - `npm install --save-dev @nrwl/angular`
-- [Nest](https://nestjs.com)
-  - `npm install --save-dev @nrwl/nest`
-- [Express](https://expressjs.com)
-  - `npm install --save-dev @nrwl/express`
-- [Node](https://nodejs.org)
-  - `npm install --save-dev @nrwl/node`
+## Start Prisma Studio
 
-There are also many [community plugins](https://nx.dev/community) you could add.
+Run `npx prisma studio` in the command line
+
+If the database is up - you can create, read, update, or delete the data
+
+## Database Connection
+
+This repository is currently connected to a local database through PostgreSql which is managed by Prisma
+
+# GraphQL
+
+Copy query below to test in the apollo server
+
+query ExampleQuery {
+  feed {
+    id
+    title
+    content
+    published
+    author {
+      id
+      name
+      email
+    }
+  }
+}
+
+
+## More CLI Commands and NX information
+
 
 ## Generate an application
 
