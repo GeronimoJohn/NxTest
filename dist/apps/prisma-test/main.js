@@ -103,21 +103,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const express = __webpack_require__(/*! express */ "express");
 const apollo_server_express_1 = __webpack_require__(/*! apollo-server-express */ "apollo-server-express");
+const context_1 = __webpack_require__(/*! ./prisma/context */ "./apps/prisma-test/src/prisma/context.ts");
+const schema_1 = __webpack_require__(/*! ./prisma/schema */ "./apps/prisma-test/src/prisma/schema.ts");
 function startApolloServer() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        // Construct a schema, using GraphQL schema language
-        const typeDefs = apollo_server_express_1.gql `
-    type Query {
-      hello: String
-    }
-  `;
-        // Provide resolver functions for your schema fields
-        const resolvers = {
-            Query: {
-                hello: () => 'Hello world!',
-            },
-        };
-        const server = new apollo_server_express_1.ApolloServer({ typeDefs, resolvers });
+        const server = new apollo_server_express_1.ApolloServer({ schema: schema_1.schema, context: context_1.context });
         yield server.start();
         const app = express();
         server.applyMiddleware({ app });
@@ -125,6 +115,227 @@ function startApolloServer() {
     });
 }
 startApolloServer();
+
+
+/***/ }),
+
+/***/ "./apps/prisma-test/src/prisma/context.ts":
+/*!************************************************!*\
+  !*** ./apps/prisma-test/src/prisma/context.ts ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.context = void 0;
+const client_1 = __webpack_require__(/*! @prisma/client */ "@prisma/client");
+const prisma = new client_1.PrismaClient();
+exports.context = {
+    prisma: prisma
+};
+
+
+/***/ }),
+
+/***/ "./apps/prisma-test/src/prisma/schema.ts":
+/*!***********************************************!*\
+  !*** ./apps/prisma-test/src/prisma/schema.ts ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.schema = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const graphql_tools_1 = __webpack_require__(/*! graphql-tools */ "graphql-tools");
+const graphql_scalars_1 = __webpack_require__(/*! graphql-scalars */ "graphql-scalars");
+const typeDefs = `
+type Mutation {
+  createDraft(authorEmail: String!, data: PostCreateInput!): Post
+  deletePost(id: Int!): Post
+  incrementPostViewCount(id: Int!): Post
+  signupUser(data: UserCreateInput!): User!
+  togglePublishPost(id: Int!): Post
+}
+
+type Post {
+  author: User
+  content: String
+  createdAt: DateTime!
+  id: Int!
+  published: Boolean!
+  title: String!
+  updatedAt: DateTime!
+  viewCount: Int!
+}
+
+input PostCreateInput {
+  content: String
+  title: String!
+}
+
+input PostOrderByUpdatedAtInput {
+  updatedAt: SortOrder!
+}
+
+type Query {
+  allUsers: [User!]!
+  draftsByUser(userUniqueInput: UserUniqueInput!): [Post]
+  feed(orderBy: PostOrderByUpdatedAtInput, searchString: String, skip: Int, take: Int): [Post!]!
+  postById(id: Int): Post
+}
+
+enum SortOrder {
+  asc
+  desc
+}
+
+type User {
+  email: String!
+  id: Int!
+  name: String
+  posts: [Post!]!
+}
+
+input UserCreateInput {
+  email: String!
+  name: String
+  posts: [PostCreateInput!]
+}
+
+input UserUniqueInput {
+  email: String
+  id: Int
+}
+
+scalar DateTime
+`;
+const resolvers = {
+    Query: {
+        allUsers: (_parent, _args, context) => {
+            return context.prisma.user.findMany();
+        },
+        postById: (_parent, args, context) => {
+            return context.prisma.post.findUnique({
+                where: { id: args.id || undefined }
+            });
+        },
+        feed: (_parent, args, context) => {
+            const or = args.searchString ? {
+                OR: [
+                    { title: { contains: args.searchString } },
+                    { content: { contains: args.searchString } }
+                ]
+            } : {};
+            return context.prisma.post.findMany({
+                where: Object.assign({ published: true }, or),
+                take: args === null || args === void 0 ? void 0 : args.take,
+                skip: args === null || args === void 0 ? void 0 : args.skip,
+                orderBy: args === null || args === void 0 ? void 0 : args.orderBy
+            });
+        },
+        draftsByUser: (_parent, args, context) => {
+            return context.prisma.user.findUnique({
+                where: {
+                    id: args.userUniqueInput.id || undefined,
+                    email: args.userUniqueInput.email || undefined,
+                },
+            }).posts({
+                where: {
+                    published: false
+                },
+            });
+        }
+    },
+    Mutation: {
+        signupUser: (_parent, args, context) => {
+            var _a;
+            const postData = (_a = args.data.posts) === null || _a === void 0 ? void 0 : _a.map(post => {
+                return { title: post.title, content: post.content || undefined };
+            });
+            return context.prisma.user.create({
+                data: {
+                    name: args.data.name,
+                    email: args.data.email,
+                    posts: {
+                        create: postData
+                    }
+                },
+            });
+        },
+        createDraft: (_parent, args, context) => {
+            return context.prisma.post.create({
+                data: {
+                    title: args.data.title,
+                    content: args.data.content,
+                    author: {
+                        connect: { email: args.authorEmail },
+                    },
+                },
+            });
+        },
+        togglePublishPost: (_parent, args, context) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+            try {
+                const post = yield context.prisma.post.findUnique({
+                    where: { id: args.id || undefined },
+                    select: {
+                        published: true
+                    }
+                });
+                return context.prisma.post.update({
+                    where: { id: args.id || undefined },
+                    data: { published: !(post === null || post === void 0 ? void 0 : post.published) },
+                });
+            }
+            catch (error) {
+                throw new Error(`Post with ID ${args.id} does not exist in the database.`);
+            }
+        }),
+        incrementPostViewCount: (_parent, args, context) => {
+            return context.prisma.post.update({
+                where: { id: args.id || undefined },
+                data: {
+                    viewCount: {
+                        increment: 1
+                    }
+                },
+            });
+        },
+        deletePost: (_parent, args, context) => {
+            return context.prisma.post.delete({
+                where: { id: args.id },
+            });
+        }
+    },
+    DateTime: graphql_scalars_1.DateTimeResolver,
+    Post: {
+        author: (parent, _args, context) => {
+            return context.prisma.post.findUnique({
+                where: { id: parent === null || parent === void 0 ? void 0 : parent.id }
+            }).author();
+        }
+    },
+    User: {
+        posts: (parent, _args, context) => {
+            return context.prisma.user.findUnique({
+                where: { id: parent === null || parent === void 0 ? void 0 : parent.id }
+            }).posts();
+        }
+    }
+};
+var SortOrder;
+(function (SortOrder) {
+    SortOrder["asc"] = "asc";
+    SortOrder["desc"] = "desc";
+})(SortOrder || (SortOrder = {}));
+exports.schema = graphql_tools_1.makeExecutableSchema({
+    resolvers,
+    typeDefs,
+});
 
 
 /***/ }),
@@ -138,6 +349,17 @@ startApolloServer();
 
 module.exports = __webpack_require__(/*! /Users/johngeronimo/Developer/NxTest/nxtest/apps/prisma-test/src/main.ts */"./apps/prisma-test/src/main.ts");
 
+
+/***/ }),
+
+/***/ "@prisma/client":
+/*!*********************************!*\
+  !*** external "@prisma/client" ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("@prisma/client");
 
 /***/ }),
 
@@ -160,6 +382,28 @@ module.exports = require("apollo-server-express");
 /***/ (function(module, exports) {
 
 module.exports = require("express");
+
+/***/ }),
+
+/***/ "graphql-scalars":
+/*!**********************************!*\
+  !*** external "graphql-scalars" ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("graphql-scalars");
+
+/***/ }),
+
+/***/ "graphql-tools":
+/*!********************************!*\
+  !*** external "graphql-tools" ***!
+  \********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("graphql-tools");
 
 /***/ }),
 
