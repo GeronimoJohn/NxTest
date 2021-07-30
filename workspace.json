@@ -100,6 +100,56 @@
           }
         }
       }
+    },
+    "prisma-test": {
+      "root": "apps/prisma-test",
+      "sourceRoot": "apps/prisma-test/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/prisma-test",
+            "main": "apps/prisma-test/src/main.ts",
+            "tsConfig": "apps/prisma-test/tsconfig.app.json",
+            "assets": ["apps/prisma-test/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/prisma-test/src/environments/environment.ts",
+                  "with": "apps/prisma-test/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "prisma-test:build"
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/prisma-test/**/*.ts"]
+          }
+        },
+        "test": {
+          "executor": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/prisma-test"],
+          "options": {
+            "jestConfig": "apps/prisma-test/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {

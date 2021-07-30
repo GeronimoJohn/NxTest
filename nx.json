@@ -32,6 +32,9 @@
     },
     "myapp": {
       "tags": []
+    },
+    "prisma-test": {
+      "tags": []
     }
   }
 }
