@@ -16,7 +16,7 @@ This repository is currently connected to a local database through PostgreSql wh
 
 To connect to your local database
 
-Go to the `scheme.prisma` file which is found in the `prisma` folder
+Go to the `schema.prisma` file which is found in the `prisma` folder
 
 Enter your `database url` to set up the connection to your database
 
