@@ -33,6 +33,13 @@
     "myapp": {
       "tags": []
     },
+    "prisma-client": {
+      "tags": []
+    },
+    "prisma-client-e2e": {
+      "tags": [],
+      "implicitDependencies": ["prisma-client"]
+    },
     "prisma-test": {
       "tags": []
     }

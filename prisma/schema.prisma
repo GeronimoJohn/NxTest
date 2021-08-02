@@ -3,7 +3,7 @@
 
 datasource db {
   provider = "postgresql"
-  url      = "Insert Database URL"
+  url      = "postgresql://postgres:Guitarplayer1996~@localhost:5432/test2"
 }
 
 generator client {
